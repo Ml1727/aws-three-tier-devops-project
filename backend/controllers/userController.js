@@ -1,59 +1,78 @@
 const userService = require("../services/userService");
 
-function getUsers(req, res) {
-  res.json({
-    message: "Users fetched successfully",
-    data: userService.getAllUsers()
-  });
-}
+async function getUsers(req, res, next) {
+  try {
+    const users = await userService.getAllUsers();
 
-function createUser(req, res) {
-  const newUser = userService.createUser(req.body);
-
-  res.status(201).json({
-    message: "User created successfully",
-    data: newUser
-  });
-}
-
-function updateUser(req, res) {
-  const id = parseInt(req.params.id);
-
-  const updatedUser = userService.updateUser(id, req.body);
-
-  if (!updatedUser) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
+    res.json({
+      message: "Users fetched successfully",
+      data: users,
     });
+  } catch (error) {
+    next(error);
   }
-
-  res.json({
-    message: "User updated successfully",
-    data: updatedUser
-  });
 }
 
-function deleteUser(req, res) {
-  const id = parseInt(req.params.id);
+async function createUser(req, res, next) {
+  try {
+    const newUser = await userService.createUser(req.body);
 
-  const deleted = userService.deleteUser(id);
-
-  if (!deleted) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
+    res.status(201).json({
+      message: "User created successfully",
+      data: newUser,
     });
+  } catch (error) {
+    next(error);
   }
+}
 
-  res.json({
-    message: "User deleted successfully"
-  });
+async function updateUser(req, res, next) {
+  try {
+    const id = parseInt(req.params.id);
+
+    const updatedUser = await userService.updateUser(id, req.body);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteUser(req, res, next) {
+  try {
+    const id = parseInt(req.params.id);
+
+    const deletedUser = await userService.deleteUser(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      message: "User deleted successfully",
+      data: deletedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
   getUsers,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };

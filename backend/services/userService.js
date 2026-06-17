@@ -1,53 +1,35 @@
-let users = [
-  {
-    id: 1,
-    name: "Admin User",
-    role: "DevOps Engineer"
-  },
-  {
-    id: 2,
-    name: "Cloud User",
-    role: "AWS Engineer"
-  }
-];
+const pool = require("../config/db");
 
-function getAllUsers() {
-  return users;
+async function getAllUsers() {
+  const result = await pool.query("SELECT * FROM users ORDER BY id ASC");
+  return result.rows;
 }
 
-function createUser(userData) {
-  const newUser = {
-    id: users.length + 1,
-    name: userData.name,
-    role: userData.role
-  };
+async function createUser(userData) {
+  const result = await pool.query(
+    "INSERT INTO users (name, role) VALUES ($1, $2) RETURNING *",
+    [userData.name, userData.role]
+  );
 
-  users.push(newUser);
-  return newUser;
+  return result.rows[0];
 }
 
-function updateUser(id, userData) {
-  const user = users.find((u) => u.id === id);
+async function updateUser(id, userData) {
+  const result = await pool.query(
+    "UPDATE users SET name = $1, role = $2 WHERE id = $3 RETURNING *",
+    [userData.name, userData.role, id]
+  );
 
-  if (!user) {
-    return null;
-  }
-
-  user.name = userData.name;
-  user.role = userData.role;
-
-  return user;
+  return result.rows[0] || null;
 }
 
-function deleteUser(id) {
-  const userExists = users.some((u) => u.id === id);
+async function deleteUser(id) {
+  const result = await pool.query(
+    "DELETE FROM users WHERE id = $1 RETURNING *",
+    [id]
+  );
 
-  if (!userExists) {
-    return false;
-  }
-
-  users = users.filter((u) => u.id !== id);
-  return true;
+  return result.rows[0] || null;
 }
 
 module.exports = {
