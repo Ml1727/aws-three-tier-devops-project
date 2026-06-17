@@ -25,3 +25,24 @@ section {
   margin: 12px 0;
   border-radius: 10px;
 }
+form {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+input {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 12px;
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
