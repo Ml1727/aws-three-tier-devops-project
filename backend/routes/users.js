@@ -1,58 +1,15 @@
 const express = require("express");
 const validateUser = require("../validators/userValidator");
-const userService = require("../services/userService");
+const userController = require("../controllers/userController");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({
-    message: "Users fetched successfully",
-    data: userService.getAllUsers()
-  });
-});
+router.get("/", userController.getUsers);
 
-router.post("/", validateUser, (req, res) => {
-  const newUser = userService.createUser(req.body);
+router.post("/", validateUser, userController.createUser);
 
-  res.status(201).json({
-    message: "User created successfully",
-    data: newUser
-  });
-});
+router.put("/:id", validateUser, userController.updateUser);
 
-router.put("/:id", validateUser, (req, res) => {
-  const id = parseInt(req.params.id);
-
-  const updatedUser = userService.updateUser(id, req.body);
-
-  if (!updatedUser) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
-    });
-  }
-
-  res.json({
-    message: "User updated successfully",
-    data: updatedUser
-  });
-});
-
-router.delete("/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-
-  const deleted = userService.deleteUser(id);
-
-  if (!deleted) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
-    });
-  }
-
-  res.json({
-    message: "User deleted successfully"
-  });
-});
+router.delete("/:id", userController.deleteUser);
 
 module.exports = router;
