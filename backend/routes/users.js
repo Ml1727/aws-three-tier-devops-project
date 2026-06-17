@@ -1,36 +1,18 @@
 const express = require("express");
 const validateUser = require("../validators/userValidator");
+const userService = require("../services/userService");
 
 const router = express.Router();
-
-let users = [
-  {
-    id: 1,
-    name: "Admin User",
-    role: "DevOps Engineer"
-  },
-  {
-    id: 2,
-    name: "Cloud User",
-    role: "AWS Engineer"
-  }
-];
 
 router.get("/", (req, res) => {
   res.json({
     message: "Users fetched successfully",
-    data: users
+    data: userService.getAllUsers()
   });
 });
 
 router.post("/", validateUser, (req, res) => {
-  const newUser = {
-    id: users.length + 1,
-    name: req.body.name,
-    role: req.body.role
-  };
-
-  users.push(newUser);
+  const newUser = userService.createUser(req.body);
 
   res.status(201).json({
     message: "User created successfully",
@@ -41,40 +23,35 @@ router.post("/", validateUser, (req, res) => {
 router.put("/:id", validateUser, (req, res) => {
   const id = parseInt(req.params.id);
 
-  const user = users.find((u) => u.id === id);
+  const updatedUser = userService.updateUser(id, req.body);
 
-  if (!user) {
+  if (!updatedUser) {
     return res.status(404).json({
       success: false,
-      message: "User not found",
+      message: "User not found"
     });
   }
 
-  user.name = req.body.name;
-  user.role = req.body.role;
-
   res.json({
     message: "User updated successfully",
-    data: user,
+    data: updatedUser
   });
 });
 
 router.delete("/:id", (req, res) => {
   const id = parseInt(req.params.id);
 
-  const userExists = users.some((u) => u.id === id);
+  const deleted = userService.deleteUser(id);
 
-  if (!userExists) {
+  if (!deleted) {
     return res.status(404).json({
       success: false,
-      message: "User not found",
+      message: "User not found"
     });
   }
 
-  users = users.filter((u) => u.id !== id);
-
   res.json({
-    message: "User deleted successfully",
+    message: "User deleted successfully"
   });
 });
 
